@@ -1,1 +1,16 @@
-{"name":"zomi-dataset-studio","private":true,"version":"1.0.0","type":"module","scripts":{"dev":"vite","build":"tsc && vite build","preview":"vite preview"},"dependencies":{"@vitejs/plugin-react":"latest","vite":"latest","typescript":"latest","react":"latest","react-dom":"latest"},"devDependencies":{}}
+{
+  "name": "zomi-dataset-studio",
+  "private": true,
+  "version": "1.2.0",
+  "type": "module",
+  "scripts": {"dev":"vite","build":"tsc && vite build","preview":"vite preview"},
+  "dependencies": {
+    "@vitejs/plugin-react":"latest",
+    "vite":"latest",
+    "typescript":"latest",
+    "react":"latest",
+    "react-dom":"latest",
+    "xlsx":"latest"
+  },
+  "devDependencies": {}
+}
