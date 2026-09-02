@@ -1,2 +1,18 @@
-# Piangpi1997-zomi-dataset-app-renew
-Professional Zomi (Tedim) AI dataset platform for collecting, validating, managing, and preparing multilingual data for AI and language technology.
+# Zomi Dataset Studio
+
+Professional Zomi (Tedim) multilingual dataset workspace.
+
+## Features
+- Zomi → Myanmar → English
+- Category, dialect, verification status
+- Search and filtering
+- Dataset validation
+- JSON export
+- Responsive Liquid Glass-inspired UI
+
+## Run
+npm install
+npm run dev
+
+## Build
+npm run build
