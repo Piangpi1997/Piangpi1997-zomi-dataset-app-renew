@@ -1,4 +1,5 @@
 import {useState} from "react";
+import ImportPanel from "./ImportPanel";
 type Stage="raw"|"cleaned"|"translated"|"verified"|"training";
 type Row={zomi:string;myanmar:string;english:string;issues:string[];confidence:number|null};
 type Report={batch_id:string;dataset_id:string;status:string;total_rows:number;flagged_rows:number;low_confidence_rows:number;training_ready:boolean;github_published:boolean};
@@ -16,6 +17,7 @@ export default function App(){
  return <main><header><div className="brand">ZOMI <span>DATASET STUDIO</span></div><span className="tag">AI-first • Owner-approved</span></header>
  <section className="hero"><p className="eyebrow">DATA QUALITY WORKSPACE</p><h1>Prepare better Zomi AI data.</h1><p>AI checks, cleans, translates and compares first. You review the results. GitHub publishing happens only after authenticated final approval.</p></section>
  <section className="panel"><h2>Dataset review</h2><label htmlFor="dataset">Dataset ID</label><div className="actions"><input id="dataset" value={datasetId} onChange={e=>setDatasetId(e.target.value)} placeholder="e.g. zomi_batch_01"/><button disabled={busy||!datasetId} onClick={run}>Run AI preflight</button></div><p className="muted">Import must already exist in the private backend. This interface does not upload or transmit files to GitHub.</p></section>
+ <ImportPanel datasetId={datasetId}/>
  <div className="metrics"><div><strong>{report?.total_rows??"—"}</strong><span>Records</span></div><div><strong>{report?.flagged_rows??"—"}</strong><span>Flagged</span></div><div><strong>{report?.low_confidence_rows??"—"}</strong><span>Needs review</span></div><div><strong>{report?.training_ready?"Ready":"Blocked"}</strong><span>Training</span></div></div>
  <section className="panel"><h2>Processing stages</h2><nav className="tabs">{stages.map(s=><button className={stage===s?"active":""} key={s} onClick={()=>setStage(s)}>{s}/</button>)}</nav><p className="muted">{stage==="verified"?"AI candidates are not human verified until approved.":stage==="training"?"Training manifest is prepared, but real model training is blocked pending independent approval.":"Stage data is held in private backend storage."}</p>
  <div className="tablewrap"><table><thead><tr><th>Zomi</th><th>Myanmar</th><th>English</th><th>AI confidence</th><th>Issues</th></tr></thead><tbody>{rows.length?rows.map((r,i)=><tr key={i}><td>{r.zomi}</td><td>{r.myanmar}</td><td>{r.english}</td><td>{r.confidence==null?"—":Math.round(r.confidence*100)+"%"}</td><td>{r.issues.join(", ")||"—"}</td></tr>):<tr><td colSpan={5}>No reviewed data loaded. Connect the backend and run preflight.</td></tr>}</tbody></table></div></section>
