@@ -6,6 +6,8 @@ on:
 jobs:
   apk:
     runs-on: ubuntu-latest
+    env:
+      VITE_API_BASE_URL: ${{ vars.ZOMI_API_BASE_URL }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -17,6 +19,10 @@ jobs:
           java-version: '21'
       - uses: android-actions/setup-android@v3
       - run: npm install --no-audit --no-fund
+      - name: Require HTTPS production API
+        run: |
+          case "$VITE_API_BASE_URL" in https://*) ;; *) echo 'Set repository variable ZOMI_API_BASE_URL to a trusted HTTPS backend URL' >&2; exit 1;; esac
+      - run: npm test
       - run: npm run build
       - run: npx cap add android
       - run: npx cap sync android
