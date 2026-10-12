@@ -1,5 +1,6 @@
 import {useState} from "react";
 import ImportPanel from "./ImportPanel";
+import {API_BASE} from "./api";
 type Stage="raw"|"cleaned"|"translated"|"verified"|"training";
 type Row={zomi:string;myanmar:string;english:string;issues:string[];confidence:number|null};
 type Report={batch_id:string;dataset_id:string;status:string;total_rows:number;flagged_rows:number;low_confidence_rows:number;training_ready:boolean;github_published:boolean};
@@ -9,7 +10,7 @@ export default function App(){
  const [report,setReport]=useState<Report|null>(null);const[stage,setStage]=useState<Stage>("raw");
  const [requestId,setRequestId]=useState("");const[error,setError]=useState("");const[busy,setBusy]=useState(false);
  const [status,setStatus]=useState("No dataset loaded");const[confirmed,setConfirmed]=useState(false);
- async function api(path:string,method="GET",body?:unknown){const res=await fetch("/api"+path,{method,credentials:"include",headers:{"Content-Type":"application/json"},body:body===undefined?undefined:JSON.stringify(body)});if(!res.ok)throw new Error((await res.text()).slice(0,300));return res.json();}
+ async function api(path:string,method="GET",body?:unknown){const res=await fetch(API_BASE+"/api"+path,{method,credentials:"include",headers:{"Content-Type":"application/json"},body:body===undefined?undefined:JSON.stringify(body)});if(!res.ok)throw new Error((await res.text()).slice(0,300));return res.json();}
  async function run(){setBusy(true);setError("");try{const r=await api("/preflight","POST",{datasetId});setReport(r.report);setRows(r.rows||[]);setStatus("AI review prepared — awaiting human review");}catch(e){setError(String(e))}finally{setBusy(false)}}
  async function request(){setBusy(true);setError("");try{const r=await api("/publication/request","POST",{datasetId,stage:"verified"});setRequestId(r.id);setStatus("Snapshot locked — awaiting owner approval")}catch(e){setError(String(e))}finally{setBusy(false)}}
  async function approve(){if(!confirmed||!requestId)return;setBusy(true);setError("");try{await api("/publication/decision","POST",{requestId,approve:true});setStatus("Approved — server worker will publish; check status for commit");setConfirmed(false)}catch(e){setError(String(e))}finally{setBusy(false)}}
