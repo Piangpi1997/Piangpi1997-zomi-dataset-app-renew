@@ -1,6 +1,6 @@
 export type ImportKind="text"|"audio"|"video";
 export type ImportResult={import_id:string;dataset_id:string;status:string;kind:ImportKind;filename?:string};
-const API_BASE=(import.meta.env.VITE_API_BASE_URL||"").replace(/\/$/,"");
+export const API_BASE=(import.meta.env.VITE_API_BASE_URL||"").replace(/\/$/,"");
 async function parseResponse(res:Response){const raw=await res.text();let data:unknown;try{data=JSON.parse(raw)}catch{throw new Error("Invalid API response")}if(!res.ok)throw new Error((data as {error?:string})?.error||"Request failed: "+res.status);return data}
 export async function uploadDatasetFile(file:File,kind:ImportKind,datasetId:string,onProgress?:(n:number)=>void):Promise<ImportResult>{
  if(!/^[a-zA-Z0-9_-]{1,80}$/.test(datasetId))throw new Error("Invalid dataset ID");
