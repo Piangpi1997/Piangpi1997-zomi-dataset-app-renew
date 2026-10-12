@@ -1,0 +1,9 @@
+{
+  "name": "Zomi Dataset Studio",
+  "short_name": "Zomi Studio",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#09111d",
+  "theme_color": "#09111d",
+  "description": "AI-first dataset review with manual owner approval"
+}
