@@ -2,7 +2,7 @@ name: Android Debug APK
 on:
   workflow_dispatch:
   push:
-    branches: [feature/pwa-android-ai-review]
+    branches: [feature/pwa-android-ai-review, feature/multimodal-import-api]
 jobs:
   apk:
     runs-on: ubuntu-latest
