@@ -17,7 +17,12 @@ jobs:
         with:
           distribution: temurin
           java-version: '21'
-      - uses: android-actions/setup-android@v3
+      - name: Check preinstalled Android SDK
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          test -d "$ANDROID_HOME" || { echo "Android SDK missing on runner" >&2; exit 1; }
+          test -x "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" || { echo "sdkmanager missing" >&2; exit 1; }
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --version
       - run: npm install --no-audit --no-fund
       - name: Require HTTPS API outside offline preview
         run: |
