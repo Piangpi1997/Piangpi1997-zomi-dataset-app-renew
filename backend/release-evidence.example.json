@@ -1,0 +1,50 @@
+{
+  "CI_BACKEND_TESTS": {
+    "status": "pending",
+    "evidence_url": ""
+  },
+  "CI_WEB_BUILD": {
+    "status": "pending",
+    "evidence_url": ""
+  },
+  "HTTPS_BACKEND": {
+    "status": "pending",
+    "evidence_url": ""
+  },
+  "USER_AUTH": {
+    "status": "pending",
+    "evidence_url": ""
+  },
+  "DATA_OWNERSHIP": {
+    "status": "pending",
+    "evidence_url": ""
+  },
+  "PRIVATE_STORAGE": {
+    "status": "pending",
+    "evidence_url": ""
+  },
+  "AI_TEXT_PIPELINE": {
+    "status": "pending",
+    "evidence_url": ""
+  },
+  "AUDIO_TRANSCRIPTION": {
+    "status": "pending",
+    "evidence_url": ""
+  },
+  "VIDEO_EXTRACTION": {
+    "status": "pending",
+    "evidence_url": ""
+  },
+  "OWNER_APPROVAL": {
+    "status": "pending",
+    "evidence_url": ""
+  },
+  "ANDROID_BUILD": {
+    "status": "pending",
+    "evidence_url": ""
+  },
+  "ANDROID_DEVICE_E2E": {
+    "status": "pending",
+    "evidence_url": ""
+  }
+}

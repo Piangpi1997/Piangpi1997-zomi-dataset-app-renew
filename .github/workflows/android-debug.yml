@@ -1,0 +1,56 @@
+name: Android Debug APK
+on:
+  workflow_dispatch:
+  push:
+    branches: [feature/pwa-android-ai-review, feature/multimodal-import-api, feature/free-static-preview]
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    env:
+      VITE_API_BASE_URL: ${{ vars.ZOMI_API_BASE_URL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Check preinstalled Android SDK
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          test -d "$ANDROID_HOME" || { echo "Android SDK missing on runner" >&2; exit 1; }
+          test -x "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" || { echo "sdkmanager missing" >&2; exit 1; }
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --version
+      - run: npm install --no-audit --no-fund
+      - name: Require HTTPS API outside offline preview
+        run: |
+          if [ "$GITHUB_REF_NAME" != "feature/free-static-preview" ]; then
+            case "$VITE_API_BASE_URL" in https://*) ;; *) echo 'Set ZOMI_API_BASE_URL to a trusted HTTPS backend URL' >&2; exit 1;; esac
+          else
+            echo "Offline preview APK: backend features remain disabled."
+            echo "VITE_API_BASE_URL=" >> "$GITHUB_ENV"
+          fi
+      - run: npm test
+      - run: npm run build
+      - name: Create Android project when absent
+        run: |
+          if [ -f android/gradlew ]; then
+            echo "Existing Android project detected; skipping cap add."
+          else
+            echo "Capacitor CLI and Android package versions:"
+            npm ls @capacitor/cli @capacitor/core @capacitor/android --depth=0
+            npx --no-install cap add android --verbose
+          fi
+      - name: Verify native Android project
+        run: |
+          test -f android/gradlew || { echo "Missing android/gradlew after cap add" >&2; exit 1; }
+          test -f android/app/build.gradle || { echo "Missing android/app/build.gradle after cap add" >&2; exit 1; }
+      - run: npx cap sync android
+      - run: chmod +x android/gradlew
+      - run: cd android && ./gradlew assembleDebug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: zomi-dataset-studio-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
