@@ -1,6 +1,7 @@
 import {useState} from "react";
 
-type Preview={name:string;lines:number;bytes:number;sample:string[];blankLines:number;duplicateLines:number;invalidJsonLines:number};
+type Preview={name:string;lines:number;bytes:number;sample:string[];blankLines:number;duplicateLines:number;invalidJsonLines:number;cleaned:string;cleanedCount:number;};
+function normalizeLines(content:string,ext:string){const seen=new Set<string>();let invalidJsonLines=0;const cleaned:string[]=[];for(const raw of content.split(/\r?\n/)){const line=raw.trim();if(!line)continue;if(ext==="jsonl"){try{JSON.parse(line)}catch{invalidJsonLines++;continue}}if(!seen.has(line)){seen.add(line);cleaned.push(line)}}return {cleaned,invalidJsonLines};}
 const MAX_BYTES=1024*1024;
 export default function LocalTextPreview(){
  const [preview,setPreview]=useState<Preview|null>(null);
@@ -15,20 +16,20 @@ export default function LocalTextPreview(){
    const content=await file.text();
    if(content.includes("\0"))throw new Error("Binary files are not supported.");
    if(ext==="json")JSON.parse(content);
-   let invalidJsonLines=0;
-   if(ext==="jsonl")for(const line of content.split(/\r?\n/)){if(line.trim()){try{JSON.parse(line)}catch{invalidJsonLines++}}}
+   const {cleaned,invalidJsonLines}=normalizeLines(content,ext||"");
    const lines=content.split(/\r?\n/);
    const populated=lines.map(x=>x.trim()).filter(Boolean);
    const duplicateLines=populated.length-new Set(populated).size;
-   setPreview({name:file.name,bytes:file.size,lines:lines.length,blankLines:lines.length-populated.length,duplicateLines,invalidJsonLines,sample:lines.slice(0,5).map(x=>x.slice(0,180))});
+   setPreview({name:file.name,bytes:file.size,lines:lines.length,blankLines:lines.length-populated.length,duplicateLines,invalidJsonLines,cleaned:cleaned.join("\n")+"\n",cleanedCount:cleaned.length,sample:lines.slice(0,5).map(x=>x.slice(0,180))});
   }catch{setError("Unable to read or validate this file.");}
  }
+ function download(){if(!preview)return;const blob=new Blob([preview.cleaned],{type:"text/plain;charset=utf-8"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="cleaned-"+preview.name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
  return <section className="panel">
   <h2>Offline text inspection</h2>
   <p className="muted">Inspect a small public or non-sensitive text dataset locally in your browser. This does not upload, save, translate, or publish the file. Do not select private datasets on shared devices.</p>
   <label htmlFor="local-file">TXT / CSV / JSON / JSONL (max 1 MB)</label>
   <input id="local-file" type="file" accept=".txt,.csv,.json,.jsonl" onChange={e=>{void inspect(e.target.files?.[0]);e.target.value="";}}/>
   {error&&<p role="alert" className="error">{error}</p>}
-  {preview&&<div role="status"><p><strong>{preview.name}</strong> — {preview.lines} lines, {preview.bytes} bytes</p><p>Blank lines: {preview.blankLines} • Duplicate non-empty lines: {preview.duplicateLines} • Invalid JSONL lines: {preview.invalidJsonLines}</p><pre style={{whiteSpace:"pre-wrap",overflowWrap:"anywhere",maxHeight:180,overflow:"auto"}}>{preview.sample.join("\n")}</pre><p className="muted">Showing first 5 lines only. Nothing was sent to the server.</p></div>}
+  {preview&&<div role="status"><p><strong>{preview.name}</strong> — {preview.lines} lines, {preview.bytes} bytes</p><p>Blank lines: {preview.blankLines} • Duplicate non-empty lines: {preview.duplicateLines} • Invalid JSONL lines: {preview.invalidJsonLines}</p><pre style={{whiteSpace:"pre-wrap",overflowWrap:"anywhere",maxHeight:180,overflow:"auto"}}>{preview.sample.join("\n")}</pre><p className="muted">Showing first 5 lines only. Nothing was sent to the server.</p><button type="button" onClick={download}>Download cleaned text ({preview.cleanedCount} lines)</button><p className="muted">Export trims lines, removes blanks and exact duplicate trimmed lines. Invalid JSONL rows are excluded. CSV and JSON are exported as plain text lines, not parsed datasets. Review before use.</p></div>}
  </section>;
 }
