@@ -1,0 +1,3 @@
+import test from "node:test";import assert from "node:assert/strict";import {readFileSync} from "node:fs";const read=p=>readFileSync(new URL(p,import.meta.url),"utf8");
+test("container runs without root and with persistent storage",()=>{const docker=read("../Dockerfile"),compose=read("../compose.yaml");assert.match(docker,/USER node/);assert.match(compose,/private_imports:\/data/);assert.match(compose,/127\.0\.0\.1:8787:8787/);assert.match(compose,/no-new-privileges:true/);});
+test("sample configuration does not contain a usable secret",()=>{const env=read("../.env.example");assert.match(env,/REPLACE_WITH_RANDOM/);assert.doesNotMatch(env,/^API_ACCESS_TOKEN=[a-f0-9]{64}$/m);});
