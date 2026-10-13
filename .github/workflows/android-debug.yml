@@ -2,7 +2,7 @@ name: Android Debug APK
 on:
   workflow_dispatch:
   push:
-    branches: [feature/pwa-android-ai-review, feature/multimodal-import-api]
+    branches: [feature/pwa-android-ai-review, feature/multimodal-import-api, feature/free-static-preview]
 jobs:
   apk:
     runs-on: ubuntu-latest
@@ -19,9 +19,14 @@ jobs:
           java-version: '21'
       - uses: android-actions/setup-android@v3
       - run: npm install --no-audit --no-fund
-      - name: Require HTTPS production API
+      - name: Require HTTPS API outside offline preview
         run: |
-          case "$VITE_API_BASE_URL" in https://*) ;; *) echo 'Set repository variable ZOMI_API_BASE_URL to a trusted HTTPS backend URL' >&2; exit 1;; esac
+          if [ "$GITHUB_REF_NAME" != "feature/free-static-preview" ]; then
+            case "$VITE_API_BASE_URL" in https://*) ;; *) echo 'Set ZOMI_API_BASE_URL to a trusted HTTPS backend URL' >&2; exit 1;; esac
+          else
+            echo "Offline preview APK: backend features remain disabled."
+            echo "VITE_API_BASE_URL=" >> "$GITHUB_ENV"
+          fi
       - run: npm test
       - run: npm run build
       - run: npx cap add android
