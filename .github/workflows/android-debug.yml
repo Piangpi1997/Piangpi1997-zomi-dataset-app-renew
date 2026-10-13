@@ -39,8 +39,14 @@ jobs:
           if [ -f android/gradlew ]; then
             echo "Existing Android project detected; skipping cap add."
           else
-            npx cap add android
+            echo "Capacitor CLI and Android package versions:"
+            npm ls @capacitor/cli @capacitor/core @capacitor/android --depth=0
+            npx --no-install cap add android --verbose
           fi
+      - name: Verify native Android project
+        run: |
+          test -f android/gradlew || { echo "Missing android/gradlew after cap add" >&2; exit 1; }
+          test -f android/app/build.gradle || { echo "Missing android/app/build.gradle after cap add" >&2; exit 1; }
       - run: npx cap sync android
       - run: chmod +x android/gradlew
       - run: cd android && ./gradlew assembleDebug
