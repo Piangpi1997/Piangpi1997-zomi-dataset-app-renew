@@ -1,7 +1,7 @@
 name: Web PWA Build
 on:
   push:
-    branches: [main, feature/pwa-android-ai-review]
+    branches: [main, feature/pwa-android-ai-review, feature/free-static-preview]
   pull_request:
   workflow_dispatch:
 jobs:
