@@ -2,3 +2,5 @@ import test from "node:test";import assert from "node:assert/strict";import {rea
 test("local inspector has no network API and limits file size",()=>{const inspector=readFileSync(new URL("../src/LocalTextPreview.tsx",import.meta.url),"utf8");assert.match(inspector,/MAX_BYTES=1024\*1024/);assert.doesNotMatch(inspector,/\bfetch\s*\(|XMLHttpRequest|sendBeacon/);assert.match(src,/<LocalTextPreview\/>/)});
 
 test("local inspector reports data quality without network calls",()=>{const inspector=readFileSync(new URL("../src/LocalTextPreview.tsx",import.meta.url),"utf8");for(const key of ["blankLines","duplicateLines","invalidJsonLines"])assert.match(inspector,new RegExp(key));assert.doesNotMatch(inspector,/\bfetch\s*\(|XMLHttpRequest|sendBeacon/)});
+
+test("JSONL quality report checks text-bearing records locally",()=>{const inspector=readFileSync(new URL("../src/LocalTextPreview.tsx",import.meta.url),"utf8");assert.match(inspector,/missingTextFields/);assert.match(inspector,/jsonlObjects/);assert.match(inspector,/\["zomi","text","source"\]/)});
