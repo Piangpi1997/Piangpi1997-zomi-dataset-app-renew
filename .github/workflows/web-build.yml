@@ -16,6 +16,7 @@ jobs:
       - run: npm test
       - run: npm run build
       - uses: actions/upload-artifact@v4
+        continue-on-error: true # artifact storage outage must not hide successful tests/build
         with:
           name: zomi-studio-web
           path: dist/
