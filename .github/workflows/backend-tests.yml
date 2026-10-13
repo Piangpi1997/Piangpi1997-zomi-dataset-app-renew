@@ -1,7 +1,7 @@
 name: Backend API Tests
 on:
   push:
-    branches: [feature/private-import-backend, feature/secure-import-hardening, feature/backend-deploy-readiness]
+    branches: [feature/private-import-backend, feature/secure-import-hardening, feature/backend-deploy-readiness, feature/backend-release-gates]
   pull_request:
   workflow_dispatch:
 jobs:
