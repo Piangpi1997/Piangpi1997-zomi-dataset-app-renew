@@ -34,7 +34,13 @@ jobs:
           fi
       - run: npm test
       - run: npm run build
-      - run: npx cap add android
+      - name: Create Android project when absent
+        run: |
+          if [ -f android/gradlew ]; then
+            echo "Existing Android project detected; skipping cap add."
+          else
+            npx cap add android
+          fi
       - run: npx cap sync android
       - run: chmod +x android/gradlew
       - run: cd android && ./gradlew assembleDebug
